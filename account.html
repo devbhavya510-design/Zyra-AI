@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account – Zyra AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Tab / Favicon Logo -->
+<link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Inter", system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #eef2ff, #f8fafc 60%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+        }
+
+        /* Card */
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(18px);
+            border-radius: 22px;
+            padding: 32px 28px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .brand i {
+            font-size: 28px;
+            color: #4f46e5;
+        }
+
+        .brand span {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        h2, h3 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Inputs */
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+        }
+
+        /* Buttons */
+        button {
+            width: 100%;
+            padding: 13px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(79,70,229,0.35);
+        }
+
+        /* Google button */
+        #googleSignup {
+            background: #fff;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #googleSignup:hover {
+            background: #f9fafb;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            color: #4f46e5;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .spacer {
+            height: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-card">
+
+    <div class="brand">
+        <i class="bi bi-stars"></i>
+        <span>Zyra AI</span>
+    </div>
+
+    <!-- STEP 1: AUTH -->
+    <div id="authStep">
+        <h2>Create Account</h2>
+
+        <form id="signupForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <div class="spacer"></div>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="spacer"></div>
+            <button type="submit">Create Account</button>
+        </form>
+
+        <div class="spacer"></div>
+
+        <button id="googleSignup">
+            <img src="https://developers.google.com/identity/images/g-logo.png" width="18">
+            Sign up with Google
+        </button>
+
+        <a href="sign.html">Already have an account? Sign in</a>
+    </div>
+
+    <!-- STEP 2: PROFILE INFO -->
+    <div id="profileStep" style="display:none;">
+        <h3>Complete your profile</h3>
+
+        <input type="text" id="name" placeholder="Full Name" required>
+        <div class="spacer"></div>
+        <input type="date" id="dob" required>
+        <div class="spacer"></div>
+
+        <button id="saveProfile">Continue</button>
+    </div>
+
+</div>
+
+<script type="module">
+    /* ------------ FIREBASE ------------ */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        GoogleAuthProvider,
+        signInWithPopup,
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import {
+        getFirestore,
+        doc,
+        setDoc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB8sqasKb-HPTAmyw7OuN4ePMWq1eRynw",
+        authDomain: "zyra-ai-e13e7.firebaseapp.com",
+        projectId: "zyra-ai-e13e7",
+        storageBucket: "zyra-ai-e13e7.firebasestorage.app",
+        messagingSenderId: "808181148702",
+        appId: "1:808181148702:web:389cff95a9efb4a728120f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById("authStep").style.display = "none";
+            document.getElementById("profileStep").style.display = "block";
+        }
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = email.value;
+        const password = password.value;
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    document.getElementById("googleSignup").addEventListener("click", async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    document.getElementById("saveProfile").addEventListener("click", async () => {
+        const name = document.getElementById("name").value.trim();
+        const dob = document.getElementById("dob").value;
+
+        if (!name || !dob) return alert("Please fill all fields");
+
+        try {
+            await setDoc(doc(db, "users", currentUser.uid), {
+                uid: currentUser.uid,
+                email: currentUser.email,
+                name,
+                dob,
+                provider: currentUser.providerData[0].providerId,
+                createdAt: serverTimestamp()
+            });
+            window.location.replace("chat.html");
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+</script>
+
+</body>
+</html>

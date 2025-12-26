@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyra AI Chat</title>
+<!-- Tab / Favicon Logo -->
+<link rel="icon" type="image/png" href="logo.png">
+
+<!-- Bootstrap CSS & Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== TOPBAR ===== -->
+<div id="topbar">
+  <!-- Hamburger floating -->
+  <button id="hamburgerBtn"><i class="bi bi-list"></i></button>
+
+  <!-- Zyra AI logo centered -->
+  <div id="logo"><img src="logo.png" alt="Logo">Zyra AI</div>
+</div>
+
+<!-- ===== CONTAINER ===== -->
+<div id="container">
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="sidebarHeader">
+      <span>Chats</span>
+      <button id="newChatBtn" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i></button>
+    </div>
+    <!-- Search chats input -->
+    <input id="searchChats" type="text" placeholder="Search chats...">
+    <!-- Chat list -->
+    <div id="chatList" class="flex-grow-1 overflow-auto"></div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div id="main">
+    <div id="chatBox"></div>
+    <div id="inputArea">
+      <input id="userInput" placeholder="Type a message..." type="text">
+      <button id="micBtn"><i class="bi bi-mic-fill"></i></button>
+      <button id="sendBtn"><i class="bi bi-send-fill"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Circle & Panel -->
+<div id="profileCircle">A</div>
+<div id="profilePanel">
+  <h6>
+    Name & DOB 
+    <i id="editProfileBtn" class="bi bi-pencil-fill" style="float:right; cursor:pointer;"></i>
+  </h6>
+  <p id="userInfo">Name: John Doe<br>DOB: 01/01/1990</p>
+  <h6>Tell me more about you</h6>
+  <textarea id="userProfileInput" placeholder="How should I talk with you?"></textarea>
+  <div class="d-flex justify-content-between align-items-center">
+    <button id="saveProfile" class="btn btn-sm btn-primary">
+      <i class="bi bi-check-circle-fill"></i> Save
+    </button>
+    <!-- Dark mode toggle inside profile panel -->
+    <button id="darkModeTogglePanel" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-moon-fill"></i> Dark Mode
+    </button>
+  </div>
+</div>
+
+<!-- Firebase & Custom JS -->
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign In – Zyra AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS (thin) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Tab / Favicon Logo -->
+<link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Inter, system-ui, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #eef2ff, #f8fafc 65%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f2937;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(18px);
+            border-radius: 22px;
+            padding: 32px 28px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.08);
+            animation: fadeUp .6s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .brand i {
+            font-size: 28px;
+            color: #4f46e5;
+        }
+
+        .brand span {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            font-size: 15px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg,#6366f1,#4f46e5);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(79,70,229,.35);
+        }
+
+        #googleSignIn {
+            background: white;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #googleSignIn:hover {
+            background: #f9fafb;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #4f46e5;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .spacer { height: 14px; }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-card">
+
+    <div class="brand">
+        <i class="bi bi-stars"></i>
+        <span>Zyra AI</span>
+    </div>
+
+    <h2>Sign In</h2>
+
+    <form id="signinForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <div class="spacer"></div>
+        <input type="password" id="password" placeholder="Password" required>
+        <div class="spacer"></div>
+        <button type="submit">Sign In</button>
+    </form>
+
+    <div class="spacer"></div>
+
+    <button id="googleSignIn">
+        <img src="https://developers.google.com/identity/images/g-logo.png" width="18">
+        Continue with Google
+    </button>
+
+    <a href="account.html">Create new account</a>
+
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        GoogleAuthProvider,
+        signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB8sqasKb-HPTAmyw7OuN4ePMWq1eRynw",
+        authDomain: "zyra-ai-e13e7.firebaseapp.com",
+        projectId: "zyra-ai-e13e7",
+        storageBucket: "zyra-ai-e13e7.firebasestorage.app",
+        messagingSenderId: "808181148702",
+        appId: "1:808181148702:web:389cff95a9efb4a728120f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    /* EMAIL SIGN-IN */
+    document.getElementById("signinForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+            await signInWithEmailAndPassword(
+                auth,
+                email.value,
+                password.value
+            );
+            window.location.replace("chat.html");
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    /* GOOGLE SIGN-IN (NEW vs EXISTING USER CHECK) */
+    document.getElementById("googleSignIn").addEventListener("click", async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+
+            if (result._tokenResponse?.isNewUser) {
+                // First-time Google user → complete profile
+                window.location.replace("account.html");
+            } else {
+                // Existing user → chat
+                window.location.replace("chat.html");
+            }
+
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+</script>
+
+</body>
+</html>

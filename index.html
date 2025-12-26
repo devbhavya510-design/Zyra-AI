@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zyra AI – Temporary Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO / Meta -->
+<meta name="description" content="Zyra AI — a futuristic AI chat experience built by Bhavya Tamboli. Fast, private, and next-generation intelligence.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="Bhavya Tamboli">
+<link rel="canonical" href="https://yourwebsite.com/index.html">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Favicon / Tab Logo -->
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff4081">
+
+<style>
+/* ===== GLOBAL ===== */
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:radial-gradient(circle at top,#fdfbff,#eef1f8);
+    color:#1f2937;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+/* ===== TOPBAR ===== */
+#topbar{
+    height:80px;
+    background:rgba(255,255,255,0.85);
+    backdrop-filter:blur(12px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.08);
+    position:relative;
+    z-index:100;
+}
+
+/* ===== LOGO ===== */
+#logo{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-size:30px;
+    font-weight:700;
+    color:#ff4081;
+}
+
+#logo img{
+    width:46px;
+    height:46px;
+    border-radius:12px;
+    box-shadow:0 0 25px rgba(255,64,129,0.45);
+}
+
+/* ===== TEMP CHAT ===== */
+#tempChat{
+    position:absolute;
+    bottom:10px;
+    font-size:13px;
+    color:#6b7280;
+}
+
+/* ===== MAIN ===== */
+#main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    background:linear-gradient(180deg,#e9edf3,#e5ddd5);
+    overflow:hidden;
+}
+
+/* ===== CHAT BOX ===== */
+#chatBox{
+    flex:1;
+    padding:18px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+#chatBox::-webkit-scrollbar{width:6px;}
+#chatBox::-webkit-scrollbar-thumb{
+    background:linear-gradient(#ff4081,#7c4dff);
+    border-radius:10px;
+}
+
+/* ===== MESSAGES ===== */
+.message{
+    max-width:78%;
+    padding:16px 20px;
+    border-radius:24px;
+    font-size:15px;
+    line-height:1.7;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    animation:floatIn .25s ease;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.user{
+    align-self:flex-end;
+    background:linear-gradient(135deg,#dcf8c6,#b9f6ca);
+    border-bottom-right-radius:6px;
+    font-weight:500;
+}
+
+.ai{
+    align-self:flex-start;
+    background:#ffffff;
+    border-left:4px solid #ff4081;
+    border-bottom-left-radius:6px;
+}
+
+/* ===== CODE BLOCK ===== */
+.ai pre{
+    background:#f7f9fc;
+    color:#0f172a;
+    padding:14px;
+    border-radius:16px;
+    margin-top:8px;
+    border:1px solid #e2e8f0;
+    font-family:'JetBrains Mono',Consolas,monospace;
+    font-size:14px;
+    overflow-x:auto;
+}
+
+/* ===== INPUT AREA ===== */
+#inputArea{
+    display:flex;
+    gap:12px;
+    padding:14px;
+    margin:12px;
+    background:rgba(255,255,255,0.9);
+    backdrop-filter:blur(10px);
+    border-radius:26px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.15);
+}
+
+#userInput{
+    flex:1;
+    padding:14px 20px;
+    border-radius:20px;
+    border:1px solid #ddd;
+    font-size:15px;
+}
+
+#userInput:focus{
+    outline:none;
+    border-color:#ff4081;
+    box-shadow:0 0 0 4px rgba(255,64,129,0.15);
+}
+
+#sendBtn{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg,#ff4081,#7c4dff);
+    color:#fff;
+    font-size:20px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+#sendBtn:hover{
+    transform:scale(1.12) rotate(6deg);
+}
+
+/* ===== FLOATING G BUTTON ===== */
+#gButton{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#4285f4,#7c4dff);
+    color:#fff;
+    font-size:24px;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+    z-index:2000;
+    box-shadow:0 0 35px rgba(66,133,244,0.6);
+}
+
+/* ===== POPUP ===== */
+#overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    z-index:1000;
+}
+
+#signInPopup{
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:#fff;
+    width:320px;
+    padding:20px;
+    border-radius:16px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.35);
+    z-index:2001;
+}
+
+#signInPopup button{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    border:none;
+    border-radius:10px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+#signInBtn{background:#ff4081;color:#fff;}
+#createAccountBtn{background:#1a73e8;color:#fff;}
+#closePopup{background:#eee;}
+
+#benefits{
+    display:none;
+    background:#f9f9f9;
+    padding:8px;
+    border-radius:10px;
+    margin-top:6px;
+    border:1px solid #ddd;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes floatIn{
+    from{opacity:0;transform:translateY(10px) scale(.98);}
+    to{opacity:1;transform:none;}
+}
+</style>
+</head>
+
+<body>
+
+<div id="topbar">
+    <div id="logo">
+        <img src="logo.png" alt="Zyra">
+        Zyra AI
+    </div>
+    <div id="tempChat">Temporary Chat</div>
+</div>
+
+<div id="main">
+    <div id="chatBox"></div>
+
+    <div id="inputArea">
+        <input id="userInput" placeholder="Ask Zyra anything…" />
+        <button id="sendBtn"><i class="bi bi-send-fill"></i></button>
+    </div>
+</div>
+
+<button id="gButton">G</button>
+
+<div id="overlay"></div>
+
+<div id="signInPopup">
+    <h3>Sign in required</h3>
+    <p>
+        Save chats & unlock features
+        <span id="detailsIcon" style="cursor:pointer;color:#1a73e8;">ℹ</span>
+    </p>
+    <div id="benefits">
+        <ul>
+            <li>Chat memory</li>
+            <li>Access on all devices</li>
+            <li>Next-gen AI upgrades</li>
+        </ul>
+    </div>
+    <button id="signInBtn">Sign In</button>
+    <button id="createAccountBtn">Create Account</button>
+    <button id="closePopup">Close</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+/* ===== FIREBASE CONFIG ===== */
+const firebaseConfig = {
+    apiKey: "AIzaSyAB8sqasKb-HPTAmyw7OuN4ePMWq1eRynw",
+    authDomain: "zyra-ai-e13e7.firebaseapp.com",
+    projectId: "zyra-ai-e13e7",
+    storageBucket: "zyra-ai-e13e7.firebasestorage.app",
+    messagingSenderId: "808181148702",
+    appId: "1:808181148702:web:389cff95a9efb4a728120f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+let isSignedIn = false;
+
+onAuthStateChanged(auth, user => {
+    if(user) window.location.replace("chat.html");
+});
+
+/* ===== AI SETUP ===== */
+const API_KEY = "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";
+
+const chatBox = document.getElementById("chatBox");
+const sendBtn = document.getElementById("sendBtn");
+
+let messagesSincePopup = 0;
+let chatHistory = [{role:"system",content:"You are Zyra, a futuristic multi-dimensional AI."}];
+
+function appendMessage(text,cls){
+    const d = document.createElement("div");
+    d.className = "message "+cls;
+    d.textContent = text;
+    chatBox.appendChild(d);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage(){
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if(!text) return;
+
+    appendMessage("You: "+text,"user");
+    input.value="";
+
+    if(!isSignedIn && ++messagesSincePopup >= 3) showPopup();
+
+    chatHistory.push({role:"user", content:text});
+
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+        method:"POST",
+        headers:{
+            "Authorization":"Bearer "+API_KEY,
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            model:"llama-3.3-70b-versatile",
+            messages:chatHistory
+        })
+    });
+
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || "No response";
+
+    appendMessage("AI: "+reply,"ai");
+    chatHistory.push({role:"assistant", content:reply});
+}
+
+sendBtn.onclick = sendMessage;
+userInput.addEventListener("keydown", e => { if(e.key==="Enter") sendMessage(); });
+
+/* ===== POPUP FUNCTIONS ===== */
+function showPopup(){ overlay.style.display="block"; signInPopup.style.display="block"; }
+function hidePopup(){ overlay.style.display="none"; signInPopup.style.display="none"; }
+
+gButton.onclick = showPopup;
+overlay.onclick = hidePopup;
+closePopup.onclick = hidePopup;
+detailsIcon.onclick = ()=> benefits.style.display = benefits.style.display==="block"?"none":"block";
+signInBtn.onclick = ()=> location.href="sign.html";
+createAccountBtn.onclick = ()=> location.href="account.html";
+</script>
+
+</body>
+</html>
